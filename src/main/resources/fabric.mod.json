@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "aethertapai",
+  "version": "1.0.0",
+  "name": "AetherTap AI",
+  "description": "Legendary FPS Booster with smart AI Assistant. Learns, optimizes, advises and roasts.",
+  "authors": ["Aether"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": { "main": ["com.aether.tapai.AetherTapAIMod"] },
+  "depends": { "fabricloader": ">=0.16.5", "minecraft": "~1.21.4" }
+}
