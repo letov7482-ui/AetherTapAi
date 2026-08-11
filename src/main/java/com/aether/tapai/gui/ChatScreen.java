@@ -9,37 +9,45 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class ChatScreen extends Screen {
     private TextFieldWidget chatInput;
     private final List<String> messages = new ArrayList<>();
     private int scroll = 0;
-    private int currentTab = 0;
+    private int currentTab = 0; // 0 = чат, 1 = буст
 
-    private static final int SIDEBAR_WIDTH = 50;
+    private final Random rand = new Random();
+    private final float[] px = new float[25], py = new float[25], ps = new float[25];
+    private long tickCount = 0;
 
     public ChatScreen() {
         super(Text.literal("AetherTap AI"));
         messages.add("AI|Привет! Я AetherTap AI. Спроси о FPS, рендерах или просто поболтай.");
+        for (int i = 0; i < 25; i++) {
+            px[i] = rand.nextFloat() * 1000;
+            py[i] = rand.nextFloat() * 1000;
+            ps[i] = 0.1f + rand.nextFloat() * 0.3f;
+        }
     }
 
     @Override
     protected void init() {
-        // Левая панель
-        addDrawableChild(ButtonWidget.builder(Text.literal("💬"), btn -> {
+        int tabY = 8;
+        // Вкладки
+        addDrawableChild(ButtonWidget.builder(Text.literal("💬 Чат"), btn -> {
             currentTab = 0; clearChildren(); init();
-        }).dimensions(5, 40, 40, 20).build());
-
-        addDrawableChild(ButtonWidget.builder(Text.literal("⚡"), btn -> {
+        }).dimensions(this.width / 2 - 80, tabY, 60, 18).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("⚡ Буст"), btn -> {
             currentTab = 1; clearChildren(); init();
-        }).dimensions(5, 65, 40, 20).build());
-
+        }).dimensions(this.width / 2 + 20, tabY, 60, 18).build());
+        // Закрыть
         addDrawableChild(ButtonWidget.builder(Text.literal("✕"), btn -> close())
             .dimensions(this.width - 20, 5, 15, 15).build());
 
         if (currentTab == 0) {
             int inputY = this.height - 30;
-            chatInput = new TextFieldWidget(textRenderer, 54, inputY, this.width - 104, 20, Text.literal("Напиши сообщение..."));
+            chatInput = new TextFieldWidget(textRenderer, 10, inputY, this.width - 100, 20, Text.literal("Напиши сообщение..."));
             chatInput.setMaxLength(200);
             addSelectableChild(chatInput);
             addDrawableChild(chatInput);
@@ -53,9 +61,9 @@ public class ChatScreen extends Screen {
                     chatInput.setText("");
                     scroll = Math.max(0, messages.size() - 10);
                 }
-            }).dimensions(this.width - 45, inputY, 35, 20).build());
+            }).dimensions(this.width - 85, inputY, 30, 20).build());
         } else {
-            int cx = this.width / 2 + 25;
+            int cx = this.width / 2;
             addDrawableChild(ButtonWidget.builder(Text.literal("🚀 ЗАПУСТИТЬ БУСТЕР"), btn -> {
                 SmartBoost.runAll();
                 messages.add("AI|" + SmartBoost.getLastResult());
@@ -65,36 +73,37 @@ public class ChatScreen extends Screen {
 
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        renderBackground(ctx, mouseX, mouseY, delta);
-        // Левая панель
-        ctx.fill(0, 0, SIDEBAR_WIDTH, this.height, 0xFF1A1A2E);
-        ctx.fill(SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH + 1, this.height, 0x50FFB300);
-        ctx.drawCenteredTextWithShadow(textRenderer, "AI", 25, 12, 0xFFFFD700);
+        // Чёрный фон
+        ctx.fill(0, 0, this.width, this.height, 0xFF0A0A0A);
+        // Сетка
+        for (int x = 0; x < this.width; x += 40)
+            for (int y = 0; y < this.height; y += 40)
+                ctx.fill(x, y, x + 1, y + 1, 0xFF1A1A2E);
+        // Золотые частицы
+        tickCount++;
+        for (int i = 0; i < 25; i++) {
+            py[i] -= ps[i];
+            if (py[i] < 0) { py[i] = this.height; px[i] = rand.nextFloat() * this.width; }
+            ctx.fill((int) px[i], (int) py[i], (int) px[i] + 2, (int) py[i] + 2, 0x55FFB300);
+        }
+
+        // Заголовок
+        ctx.drawCenteredTextWithShadow(textRenderer, "⚡ AetherTap AI ⚡", this.width / 2, 12, 0xFFFFD700);
+        ctx.fill(10, 30, this.width - 10, 31, 0x50FFB300);
 
         if (currentTab == 0) {
-            int y = 14;
+            int y = 36;
             for (int i = scroll; i < Math.min(messages.size(), scroll + 12); i++) {
                 String[] parts = messages.get(i).split("\\|", 2);
                 String sender = parts[0];
                 String text = parts[1];
-
-                int textWidth = textRenderer.getWidth(text);
-                int rectX = 54;
-                int rectW = textWidth + 12;
-                int rectH = 16;
-
-                // Тёмный прямоугольник под сообщением
-                int bgColor = sender.equals("Вы") ? 0xFF1E3A5F : 0xFF2D2D2D; // синий для пользователя, серый для ИИ
-                ctx.fill(rectX, y - 1, rectX + rectW, y + rectH - 1, bgColor);
-
-                // Текст
-                int textColor = sender.equals("Вы") ? 0xFF55FFFF : 0xFFFFFFFF;
-                ctx.drawTextWithShadow(textRenderer, text, rectX + 6, y + 1, textColor);
-
-                y += 18;
+                // Яркий голубой для пользователя, белый для ИИ
+                int color = sender.equals("Вы") ? 0xFF55FFFF : 0xFFFFFFFF;
+                ctx.drawTextWithShadow(textRenderer, text, 10, y, color);
+                y += 14;
             }
         } else {
-            ctx.drawCenteredTextWithShadow(textRenderer, "Нажми кнопку для запуска бустера", this.width / 2 + 25, 30, 0xFFFFFFFF);
+            ctx.drawCenteredTextWithShadow(textRenderer, "Нажми кнопку для запуска бустера", this.width / 2, 40, 0xFFFFFFFF);
         }
 
         super.render(ctx, mouseX, mouseY, delta);
@@ -102,9 +111,7 @@ public class ChatScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mx, double my, double h, double v) {
-        if (mx > SIDEBAR_WIDTH) {
-            scroll = Math.max(0, Math.min(messages.size() - 12, scroll - (int)v));
-        }
+        scroll = Math.max(0, Math.min(messages.size() - 12, scroll - (int)v));
         return true;
     }
-    }
+                }
