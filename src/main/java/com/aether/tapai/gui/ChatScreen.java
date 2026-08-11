@@ -84,29 +84,29 @@ public class ChatScreen extends Screen {
                 int bubbleY = y - 1;
 
                 if (sender.equals("Вы")) {
-                    // Голубое облачко пользователя (справа)
+                    // Твоё облачко – ярко-голубое с белым текстом
                     bubbleX = this.width - bubbleWidth - 12;
                     textX = bubbleX + 8;
-                    ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 14, 0xFF4282CC);
-                    // обводка
+                    ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 16, 0xFF4282CC);
+                    // Белая обводка
                     ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 1, 0xFFFFFFFF);
-                    ctx.fill(bubbleX, bubbleY + 13, bubbleX + bubbleWidth, bubbleY + 14, 0xFFFFFFFF);
-                    ctx.fill(bubbleX, bubbleY, bubbleX + 1, bubbleY + 14, 0xFFFFFFFF);
-                    ctx.fill(bubbleX + bubbleWidth - 1, bubbleY, bubbleX + bubbleWidth, bubbleY + 14, 0xFFFFFFFF);
-                    ctx.drawTextWithShadow(textRenderer, text, textX, y, 0xFFFFFFFF);
+                    ctx.fill(bubbleX, bubbleY + 15, bubbleX + bubbleWidth, bubbleY + 16, 0xFFFFFFFF);
+                    ctx.fill(bubbleX, bubbleY, bubbleX + 1, bubbleY + 16, 0xFFFFFFFF);
+                    ctx.fill(bubbleX + bubbleWidth - 1, bubbleY, bubbleX + bubbleWidth, bubbleY + 16, 0xFFFFFFFF);
+                    ctx.drawTextWithShadow(textRenderer, text, textX, y + 1, 0xFFFFFFFF);
                 } else {
-                    // Золотистое облачко AI (слева)
+                    // Облачко ИИ – светлое золотистое с тёмным текстом
                     bubbleX = 54;
                     textX = bubbleX + 8;
-                    ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 14, 0xFF4D3B1F);
-                    // обводка
+                    ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 16, 0xFFF5E6C8); // светло-кремовый
+                    // Золотая обводка
                     ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 1, 0xFFFFD700);
-                    ctx.fill(bubbleX, bubbleY + 13, bubbleX + bubbleWidth, bubbleY + 14, 0xFFFFD700);
-                    ctx.fill(bubbleX, bubbleY, bubbleX + 1, bubbleY + 14, 0xFFFFD700);
-                    ctx.fill(bubbleX + bubbleWidth - 1, bubbleY, bubbleX + bubbleWidth, bubbleY + 14, 0xFFFFD700);
-                    ctx.drawTextWithShadow(textRenderer, text, textX, y, 0xFFFFFFFF);
+                    ctx.fill(bubbleX, bubbleY + 15, bubbleX + bubbleWidth, bubbleY + 16, 0xFFFFD700);
+                    ctx.fill(bubbleX, bubbleY, bubbleX + 1, bubbleY + 16, 0xFFFFD700);
+                    ctx.fill(bubbleX + bubbleWidth - 1, bubbleY, bubbleX + bubbleWidth, bubbleY + 16, 0xFFFFD700);
+                    ctx.drawTextWithShadow(textRenderer, text, textX, y + 1, 0xFF000000); // чёрный текст
                 }
-                y += 16;
+                y += 18;
             }
         } else {
             ctx.drawCenteredTextWithShadow(textRenderer, "Нажми кнопку для запуска бустера", this.width / 2 + 25, 30, 0xFFFFFFFF);
@@ -122,4 +122,4 @@ public class ChatScreen extends Screen {
         }
         return true;
     }
-}
+                             }
