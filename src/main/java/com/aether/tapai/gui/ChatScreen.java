@@ -72,16 +72,26 @@ public class ChatScreen extends Screen {
         ctx.drawCenteredTextWithShadow(textRenderer, "AI", 25, 12, 0xFFFFD700);
 
         if (currentTab == 0) {
-            int y = 12;
+            int y = 14;
             for (int i = scroll; i < Math.min(messages.size(), scroll + 12); i++) {
                 String[] parts = messages.get(i).split("\\|", 2);
                 String sender = parts[0];
                 String text = parts[1];
 
-                // Белый текст для ИИ, голубой для пользователя
-                int color = sender.equals("Вы") ? 0xFF55FFFF : 0xFFFFFFFF;
-                ctx.drawTextWithShadow(textRenderer, text, 54, y, color);
-                y += 14;
+                int textWidth = textRenderer.getWidth(text);
+                int rectX = 54;
+                int rectW = textWidth + 12;
+                int rectH = 16;
+
+                // Тёмный прямоугольник под сообщением
+                int bgColor = sender.equals("Вы") ? 0xFF1E3A5F : 0xFF2D2D2D; // синий для пользователя, серый для ИИ
+                ctx.fill(rectX, y - 1, rectX + rectW, y + rectH - 1, bgColor);
+
+                // Текст
+                int textColor = sender.equals("Вы") ? 0xFF55FFFF : 0xFFFFFFFF;
+                ctx.drawTextWithShadow(textRenderer, text, rectX + 6, y + 1, textColor);
+
+                y += 18;
             }
         } else {
             ctx.drawCenteredTextWithShadow(textRenderer, "Нажми кнопку для запуска бустера", this.width / 2 + 25, 30, 0xFFFFFFFF);
@@ -97,4 +107,4 @@ public class ChatScreen extends Screen {
         }
         return true;
     }
-                                           }
+    }
