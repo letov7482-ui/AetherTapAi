@@ -3,7 +3,7 @@ package com.aether.tapai;
 import com.aether.tapai.engine.MindEngine;
 import com.aether.tapai.engine.SmartBoost;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
+import net.fabricmc.fabric.api.client.message.v1.ClientMessageEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
@@ -30,16 +30,16 @@ public class AetherTapAIMod implements ModInitializer {
             }
         });
 
-        // Перехват сообщений чата
-        ClientSendMessageEvents.ALLOW.register((message) -> {
+        // Перехват сообщений чата (Fabric 1.21.4)
+        ClientMessageEvents.CHAT_SEND.register((message) -> {
             String msg = message.trim();
-            if (msg.isEmpty()) return true;
+            if (msg.isEmpty()) return;
 
             // Бустер
             if (msg.equalsIgnoreCase("!boost") || msg.equalsIgnoreCase("!буст")) {
                 SmartBoost.runAll();
                 SmartBoost.sendToChat();
-                return false;
+                return; // не отправляем на сервер
             }
 
             // Профили
@@ -49,7 +49,7 @@ public class AetherTapAIMod implements ModInitializer {
                     SmartBoost.runProfile(parts[1]);
                     SmartBoost.sendToChat();
                 }
-                return false;
+                return;
             }
 
             // Статус
@@ -58,14 +58,14 @@ public class AetherTapAIMod implements ModInitializer {
                 if (client.player != null) {
                     client.player.sendMessage(Text.literal("§6[AetherTap]§f " + SmartBoost.getStatus()), false);
                 }
-                return false;
+                return;
             }
 
             // Сброс
             if (msg.equalsIgnoreCase("!reset") || msg.equalsIgnoreCase("!сброс")) {
                 SmartBoost.resetAll();
                 SmartBoost.sendToChat();
-                return false;
+                return;
             }
 
             // ИИ
@@ -76,10 +76,11 @@ public class AetherTapAIMod implements ModInitializer {
                 if (client.player != null) {
                     client.player.sendMessage(Text.literal("§6[AI]§f " + answer), false);
                 }
-                return false;
+                return;
             }
 
-            return true;
+            // Если это не наша команда — отправляем на сервер (но это не нужно, т.к. мы перехватываем и не отправляем)
+            // В CHAT_SEND возвращать ничего не нужно, мы просто не вызываем оригинальную отправку
         });
     }
 }
