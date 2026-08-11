@@ -20,7 +20,7 @@ public class ChatScreen extends Screen {
 
     public ChatScreen() {
         super(Text.literal("AetherTap AI"));
-        messages.add("§6[AI]§f Привет! Я AetherTap AI. Спроси о FPS, рендерах или просто поболтай.");
+        messages.add("AI|Привет! Я AetherTap AI. Спроси о FPS, рендерах или просто поболтай.");
     }
 
     @Override
@@ -41,17 +41,15 @@ public class ChatScreen extends Screen {
             int inputY = this.height - 30;
             chatInput = new TextFieldWidget(textRenderer, 54, inputY, this.width - 104, 20, Text.literal("Напиши сообщение..."));
             chatInput.setMaxLength(200);
-            // ОБЯЗАТЕЛЬНО добавить и как selectable, и как drawable
             addSelectableChild(chatInput);
             addDrawableChild(chatInput);
             setInitialFocus(chatInput);
 
-            // Кнопка отправить
             addDrawableChild(ButtonWidget.builder(Text.literal("▶"), btn -> {
                 String msg = chatInput.getText().trim();
                 if (!msg.isEmpty()) {
-                    messages.add("§b[Вы]§f " + msg);
-                    messages.add("§6[AI]§f " + MindEngine.process(msg));
+                    messages.add("Вы|" + msg);
+                    messages.add("AI|" + MindEngine.process(msg));
                     chatInput.setText("");
                     scroll = Math.max(0, messages.size() - 10);
                 }
@@ -60,7 +58,7 @@ public class ChatScreen extends Screen {
             int cx = this.width / 2 + 25;
             addDrawableChild(ButtonWidget.builder(Text.literal("🚀 ЗАПУСТИТЬ БУСТЕР"), btn -> {
                 SmartBoost.runAll();
-                messages.add("§6[AI]§f " + SmartBoost.getLastResult());
+                messages.add("AI|" + SmartBoost.getLastResult());
             }).dimensions(cx - 80, this.height / 2, 160, 20).build());
         }
     }
@@ -74,10 +72,41 @@ public class ChatScreen extends Screen {
         ctx.drawCenteredTextWithShadow(textRenderer, "AI", 25, 12, 0xFFFFD700);
 
         if (currentTab == 0) {
-            int y = 15;
+            int y = 12;
             for (int i = scroll; i < Math.min(messages.size(), scroll + 12); i++) {
-                ctx.drawTextWithShadow(textRenderer, messages.get(i), 54, y, 0xFFFFFFFF);
-                y += 14;
+                String[] parts = messages.get(i).split("\\|", 2);
+                String sender = parts[0];
+                String text = parts[1];
+
+                int textWidth = textRenderer.getWidth(text);
+                int bubbleWidth = textWidth + 16;
+                int bubbleX, textX;
+                int bubbleY = y - 1;
+
+                if (sender.equals("Вы")) {
+                    // Голубое облачко пользователя (справа)
+                    bubbleX = this.width - bubbleWidth - 12;
+                    textX = bubbleX + 8;
+                    ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 14, 0xFF4282CC);
+                    // обводка
+                    ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 1, 0xFFFFFFFF);
+                    ctx.fill(bubbleX, bubbleY + 13, bubbleX + bubbleWidth, bubbleY + 14, 0xFFFFFFFF);
+                    ctx.fill(bubbleX, bubbleY, bubbleX + 1, bubbleY + 14, 0xFFFFFFFF);
+                    ctx.fill(bubbleX + bubbleWidth - 1, bubbleY, bubbleX + bubbleWidth, bubbleY + 14, 0xFFFFFFFF);
+                    ctx.drawTextWithShadow(textRenderer, text, textX, y, 0xFFFFFFFF);
+                } else {
+                    // Золотистое облачко AI (слева)
+                    bubbleX = 54;
+                    textX = bubbleX + 8;
+                    ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 14, 0xFF4D3B1F);
+                    // обводка
+                    ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 1, 0xFFFFD700);
+                    ctx.fill(bubbleX, bubbleY + 13, bubbleX + bubbleWidth, bubbleY + 14, 0xFFFFD700);
+                    ctx.fill(bubbleX, bubbleY, bubbleX + 1, bubbleY + 14, 0xFFFFD700);
+                    ctx.fill(bubbleX + bubbleWidth - 1, bubbleY, bubbleX + bubbleWidth, bubbleY + 14, 0xFFFFD700);
+                    ctx.drawTextWithShadow(textRenderer, text, textX, y, 0xFFFFFFFF);
+                }
+                y += 16;
             }
         } else {
             ctx.drawCenteredTextWithShadow(textRenderer, "Нажми кнопку для запуска бустера", this.width / 2 + 25, 30, 0xFFFFFFFF);
@@ -93,4 +122,4 @@ public class ChatScreen extends Screen {
         }
         return true;
     }
-                                 }
+}
