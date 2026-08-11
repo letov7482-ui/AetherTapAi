@@ -15,9 +15,8 @@ public class ChatScreen extends Screen {
     private final List<String> messages = new ArrayList<>();
     private int scroll = 0;
 
-    protected ChatScreen() {
+    public ChatScreen() {  // <-- public
         super(Text.literal("AetherTap AI"));
-        // Приветственное сообщение берётся из MindConfig через MindEngine
         messages.add("AI: " + MindEngine.process("привет"));
     }
 
@@ -30,25 +29,21 @@ public class ChatScreen extends Screen {
         addSelectableChild(chatInput);
         setInitialFocus(chatInput);
 
-        // Кнопка отправки сообщения
         addDrawableChild(ButtonWidget.builder(Text.literal("▶"), btn -> {
             String msg = chatInput.getText().trim();
             if (!msg.isEmpty()) {
                 messages.add("Вы: " + msg);
-                // Используем наш умный движок!
                 messages.add("AI: " + MindEngine.process(msg));
                 chatInput.setText("");
                 scroll = Math.max(0, messages.size() - 10);
             }
         }).dimensions(this.width - 85, inputY, 30, 20).build());
 
-        // Кнопка BOOST (запускает реальный бустер)
         addDrawableChild(ButtonWidget.builder(Text.literal("⚡ BOOST"), btn -> {
             SmartBoost.runAll();
             messages.add("AI: " + SmartBoost.getLastResult());
         }).dimensions(this.width / 2 - 40, 35, 80, 20).build());
 
-        // Кнопка закрыть
         addDrawableChild(ButtonWidget.builder(Text.literal("✕"), btn -> close())
             .dimensions(this.width - 20, 5, 15, 15).build());
     }
@@ -71,4 +66,4 @@ public class ChatScreen extends Screen {
         scroll = Math.max(0, Math.min(messages.size() - 10, scroll - (int)v));
         return true;
     }
-                                   }
+}
