@@ -78,35 +78,10 @@ public class ChatScreen extends Screen {
                 String sender = parts[0];
                 String text = parts[1];
 
-                int textWidth = textRenderer.getWidth(text);
-                int bubbleWidth = textWidth + 16;
-                int bubbleX, textX;
-                int bubbleY = y - 1;
-
-                if (sender.equals("Вы")) {
-                    // Твоё облачко – ярко-голубое с белым текстом
-                    bubbleX = this.width - bubbleWidth - 12;
-                    textX = bubbleX + 8;
-                    ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 16, 0xFF4282CC);
-                    // Белая обводка
-                    ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 1, 0xFFFFFFFF);
-                    ctx.fill(bubbleX, bubbleY + 15, bubbleX + bubbleWidth, bubbleY + 16, 0xFFFFFFFF);
-                    ctx.fill(bubbleX, bubbleY, bubbleX + 1, bubbleY + 16, 0xFFFFFFFF);
-                    ctx.fill(bubbleX + bubbleWidth - 1, bubbleY, bubbleX + bubbleWidth, bubbleY + 16, 0xFFFFFFFF);
-                    ctx.drawTextWithShadow(textRenderer, text, textX, y + 1, 0xFFFFFFFF);
-                } else {
-                    // Облачко ИИ – светлое золотистое с тёмным текстом
-                    bubbleX = 54;
-                    textX = bubbleX + 8;
-                    ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 16, 0xFFF5E6C8); // светло-кремовый
-                    // Золотая обводка
-                    ctx.fill(bubbleX, bubbleY, bubbleX + bubbleWidth, bubbleY + 1, 0xFFFFD700);
-                    ctx.fill(bubbleX, bubbleY + 15, bubbleX + bubbleWidth, bubbleY + 16, 0xFFFFD700);
-                    ctx.fill(bubbleX, bubbleY, bubbleX + 1, bubbleY + 16, 0xFFFFD700);
-                    ctx.fill(bubbleX + bubbleWidth - 1, bubbleY, bubbleX + bubbleWidth, bubbleY + 16, 0xFFFFD700);
-                    ctx.drawTextWithShadow(textRenderer, text, textX, y + 1, 0xFF000000); // чёрный текст
-                }
-                y += 18;
+                // Белый текст для ИИ, голубой для пользователя
+                int color = sender.equals("Вы") ? 0xFF55FFFF : 0xFFFFFFFF;
+                ctx.drawTextWithShadow(textRenderer, text, 54, y, color);
+                y += 14;
             }
         } else {
             ctx.drawCenteredTextWithShadow(textRenderer, "Нажми кнопку для запуска бустера", this.width / 2 + 25, 30, 0xFFFFFFFF);
@@ -122,4 +97,4 @@ public class ChatScreen extends Screen {
         }
         return true;
     }
-                             }
+                                           }
