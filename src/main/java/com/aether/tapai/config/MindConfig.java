@@ -1,5 +1,6 @@
 package com.aether.tapai.config;
 
+import net.minecraft.client.MinecraftClient;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
@@ -52,6 +53,22 @@ public class MindConfig {
             "Установи Sodium, выдели больше RAM, уменьши дальность прорисовки, и обязательно запусти мой бустер командой !boost.");
         addKeywords("какие моды совместимы | конфликты модов",
             "Я отлично работаю с Sodium, Iris, Lithium, Fabric API. Если есть проблемы, напиши – помогу.");
+        addKeywords("какие бустеры есть | сколько всего оптимизаций | что делает бустер | как ускоряет | что даёт boost",
+            "Я запускаю 20+ оптимизаций: JVM, лаунчер, OpenGL, Sodium, Iris, сеть, память, чанки, частицы, звуки, потоки, CPU, диск, GC, кэш, мипмапы, анимации, освещение, туман и дальность прорисовки. Всё это вместе даёт максимальный прирост FPS.");
+        addKeywords("как бустер повышает fps | почему растёт фпс | за счёт чего буст | как работает ускорение",
+            "Я отключаю VSync, включаю агрессивный culling, сжимаю вершины, оптимизирую чанки, снижаю нагрузку на CPU и память. Это реально ускоряет игру без потери графики.");
+        addKeywords("как запустить бустер | команда для буста | ускорь игру | хочу больше fps",
+            "Просто скажи '!boost' или '!буст' в чате, и я запущу все 20+ оптимизаций сразу. Также можно нажать кнопку AetherTap в главном меню.");
+        addKeywords("как отключить бустер | вернуть настройки | сбросить оптимизацию",
+            "Скажи '!reset' или '!сброс', и я верну оригинальные настройки Minecraft из бекапа.");
+        addKeywords("почему упал фпс | опять лагает | что делать если fps низкий",
+            "Проверь, запущен ли бустер (скажи '!status'). Если нет – скажи '!boost'. Также попробуй уменьшить дальность прорисовки вручную.");
+        addKeywords("какие профили есть | режимы бустера | pvp mining ultra",
+            "У меня три профиля: !boost pvp (макс FPS для битв), !boost mining (баланс), !boost ultra (для слабых устройств).");
+        addKeywords("как сбросить настройки | вернуть как было | отменить буст",
+            "Скажи '!reset', и я восстановлю настройки из бекапа.");
+        addKeywords("как узнать статус бустера | активен ли бустер | что сейчас включено",
+            "Скажи '!status', и я покажу текущий FPS и активные оптимизации.");
 
         // --- ТВОРЧЕСКИЕ ОТВЕТЫ ПРИ НЕПОНИМАНИИ ---
         chaosResponses.add("Я не совсем понял, но могу запустить бустер! Скажи !boost.");
@@ -64,7 +81,6 @@ public class MindConfig {
     }
 
     // ====== МЕТОДЫ ДОБАВЛЕНИЯ ======
-
     private static void addExact(String phrase, String answer) {
         exactMatches.put(phrase.toLowerCase().trim(), answer);
     }
@@ -77,12 +93,10 @@ public class MindConfig {
     }
 
     // ====== МЕТОДЫ ПОИСКА ======
-
     public static String findExact(String input) {
         return exactMatches.get(input);
     }
 
-    // Нечёткий поиск (для опечаток)
     public static String findFuzzy(String input) {
         String bestMatch = null;
         int bestDistance = Integer.MAX_VALUE;
@@ -125,7 +139,6 @@ public class MindConfig {
     }
 
     // ====== ПОЛЬЗОВАТЕЛЬСКИЕ ФРАЗЫ ======
-
     public static void addCustom(String key, String value) {
         exactMatches.put(key.toLowerCase().trim(), value.trim());
         saveCustom(key, value);
@@ -151,7 +164,6 @@ public class MindConfig {
     }
 
     // ====== ВСПОМОГАТЕЛЬНЫЕ ======
-
     private static int levenshteinDistance(String a, String b) {
         int[][] dp = new int[a.length() + 1][b.length() + 1];
         for (int i = 0; i <= a.length(); i++) dp[i][0] = i;
@@ -173,4 +185,4 @@ public class MindConfig {
             this.answer = answer;
         }
     }
-    }
+        }
