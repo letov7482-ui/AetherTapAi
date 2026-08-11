@@ -6,29 +6,31 @@ import java.util.*;
 
 public class MindEngine {
     private static final Random RANDOM = new Random();
-    // Контекст: последние 5 сообщений
     private static final LinkedList<String> context = new LinkedList<>();
     private static final int CONTEXT_SIZE = 5;
-    // Псевдо-настроение (меняется от тональности)
     private static String mood = "нейтральное";
+
+    private static final Set<String> PERFORMANCE_TERMS = new HashSet<>(Arrays.asList(
+        "fps", "фпс", "лаг", "тормоз", "фриз", "производительн", "оптимизац", "буст", "boost",
+        "рендер", "настройк", "график", "память", "ram", "поток", "процессор", "видеокарт",
+        "sodium", "iris", "minecraft", "игра", "частота", "vsync", "разрешение"
+    ));
 
     public static String process(String input) {
         String lower = input.toLowerCase().trim();
         if (lower.isEmpty()) return "Ты что-то хотел спросить?";
 
-        // Сохраняем в контекст
         context.addLast(lower);
         if (context.size() > CONTEXT_SIZE) context.removeFirst();
 
-        // Анализ тональности
         String tone = analyzeTone(lower);
         updateMood(tone);
 
-        // 1. Точное совпадение (приоритет)
+        // 1. Точное совпадение
         String exact = MindConfig.findExact(lower);
         if (exact != null) return applyMood(randomVariant(exact));
 
-        // 2. Нечёткий поиск (опечатки)
+        // 2. Нечёткий поиск
         String fuzzy = MindConfig.findFuzzy(lower);
         if (fuzzy != null) return applyMood(randomVariant(fuzzy));
 
@@ -57,6 +59,9 @@ public class MindEngine {
         if (lower.contains("система") || lower.contains("устройство")) {
             return applyMood(SystemAnalyzer.getFullReport());
         }
+        if (lower.equals("help") || lower.equals("помощь") || lower.equals("справка")) {
+            return "Доступные команды: !boost, !boost pvp/mining/ultra, !status, !reset, !ai <вопрос>. Также можно обучить меня через 'запомни: фраза -> ответ'. Подробнее спроси 'что ты умеешь'.";
+        }
 
         // 5. Контекстный анализ
         if (lower.length() < 10 && context.size() >= 2) {
@@ -75,11 +80,26 @@ public class MindEngine {
             return "Формат: запомни: <ключ> -> <ответ>";
         }
 
-        // 7. Творческий ответ
+        // 7. Fallback для вопросов о производительности
+        boolean hasPerformanceTerm = PERFORMANCE_TERMS.stream().anyMatch(lower::contains);
+        if (hasPerformanceTerm) {
+            return applyMood("Ты спрашиваешь о производительности? Попробуй команду !boost, или спроси 'как повысить FPS'.");
+        }
+
+        // 8. Fallback для вопросительных предложений
+        if (lower.contains("?") || lower.startsWith("как") || lower.startsWith("что") || lower.startsWith("почему") || lower.startsWith("где") || lower.startsWith("когда")) {
+            return applyMood("Хороший вопрос! Попробуй спросить иначе, например: 'как повысить FPS' или 'что ты умеешь'. Я обязательно помогу!");
+        }
+
+        // 9. Fallback если запрос про игру/мод
+        if (lower.contains("майнкрафт") || lower.contains("minecraft") || lower.contains("мод") || lower.contains("aether")) {
+            return applyMood("Кажется, ты спрашиваешь о моде или игре. Попробуй уточнить вопрос, я постараюсь ответить!");
+        }
+
+        // 10. Творческий ответ
         return applyMood(MindConfig.getRandomChaos());
     }
 
-    // Анализ тональности (упрощённый)
     private static String analyzeTone(String text) {
         String lower = text.toLowerCase();
         if (lower.contains("спасибо") || lower.contains("крут") || lower.contains("отлично") || lower.contains("молодец")) return "позитив";
@@ -88,7 +108,6 @@ public class MindEngine {
         return "нейтральное";
     }
 
-    // Обновление настроения
     private static void updateMood(String tone) {
         switch (tone) {
             case "позитив": mood = "радостное"; break;
@@ -98,7 +117,6 @@ public class MindEngine {
         }
     }
 
-    // Применение настроения к ответу
     private static String applyMood(String answer) {
         switch (mood) {
             case "радостное": return answer + " 😊";
